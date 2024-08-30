@@ -9,8 +9,11 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-aj2f4%3+9=6gc!ju3aqbumb2^^h*ik&-yx^cu7pgl+6zijr9&3'
+SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ["DEBUG"] == "true"
 
 ALLOWED_HOSTS = []
 
@@ -39,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'django_q',
-    'django_cron',
     'core'
 ]
 
@@ -90,12 +92,11 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD':   'MONKEYSex',
-        'HOST': 'localhost',
-
-        'PORT': '5432',  # Default PostgreSQL port
+        'NAME': os.environ["DB_NAME"],
+        'USER': os.environ["DB_USER"],
+        'PASSWORD': os.environ["DB_PASSWORD"],
+        'HOST': os.environ["DB_HOST"],
+        'PORT': os.environ["DB_PORT"],  # Default PostgreSQL port
     }
 }
 
@@ -151,17 +152,5 @@ Q_CLUSTER = {
     'cpu_affinity': 1,
     'label': 'Django Q',
     'orm': 'default',  # Use Django ORM as a fallback for result persistence
-    'broker': {
-        'scheme': 'amqp',
-        'host': 'localhost',
-        'port': 5672,
-        'vhost': '/',
-        'username': 'guest',
-        'password': 'guest',
-        'timeout': 30,
-        'max_retries': 5,
-        'queue_name': 'django_q_tasks',
-        'exchange': 'django_q',
-        'routing_key': 'django_q'
-    }
+    'broker': "amqp://guest:guest@localhost:5672/"
 }
